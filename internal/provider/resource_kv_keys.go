@@ -114,14 +114,21 @@ func (r *KvKeysResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	merged := mergeKeys(existingData, planKeys)
+	if !keysMatch(existingData, planKeys) {
+		merged := mergeKeys(existingData, planKeys)
 
-	if err := r.writeSecret(mount, path, merged); err != nil {
-		resp.Diagnostics.AddError(
-			"Failed to Write Secret",
-			fmt.Sprintf("Could not write to %s/%s: %s", mount, path, err),
-		)
-		return
+		if err := r.writeSecret(mount, path, merged); err != nil {
+			resp.Diagnostics.AddError(
+				"Failed to Write Secret",
+				fmt.Sprintf("Could not write to %s/%s: %s", mount, path, err),
+			)
+			return
+		}
+	} else {
+		tflog.Info(ctx, "All keys already exist with the same values, skipping write", map[string]interface{}{
+			"mount": mount,
+			"path":  path,
+		})
 	}
 
 	plan.ID = types.StringValue(fmt.Sprintf("%s/%s", mount, path))
@@ -428,6 +435,15 @@ func mergeKeys(existingData, newKeys map[string]string) map[string]string {
 		merged[k] = v
 	}
 	return merged
+}
+
+func keysMatch(existing, planned map[string]string) bool {
+	for k, v := range planned {
+		if ev, ok := existing[k]; !ok || ev != v {
+			return false
+		}
+	}
+	return true
 }
 
 func keysOnly(m map[string]string) string {

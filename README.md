@@ -31,7 +31,7 @@ terraform {
   required_providers {
     vaultpatch = {
       source  = "davispalomino/vaultpatch"
-      version = "0.1.0"
+      version = "1.1.0"
     }
   }
 }
