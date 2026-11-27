@@ -31,7 +31,7 @@ terraform {
   required_providers {
     vaultpatch = {
       source  = "davispalomino/vaultpatch"
-      version = "1.1.0"
+      version = "1.2.0"
     }
   }
 }
@@ -66,9 +66,11 @@ Other keys in the same path are **never** modified.
 
 | Attribute | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `address` | string | yes | Vault server URL |
-| `role_id` | string | yes | AppRole Role ID |
-| `secret_id` | string | yes | AppRole Secret ID |
+| `address` | string | no | Vault server URL |
+| `role_id` | string | no | AppRole Role ID |
+| `secret_id` | string | no | AppRole Secret ID |
+
+The three attributes are needed to manage `vaultpatch_kv_keys`. A configuration that manages none, such as a root that only inherits the provider from a module with zero instances, can omit the provider block and plans without contacting Vault. Setting only some of them is an error, and a `vaultpatch_kv_keys` resource without them fails at plan with `Vault Provider Not Configured`.
 
 ## Resource: `vaultpatch_kv_keys`
 

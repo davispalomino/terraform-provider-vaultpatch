@@ -80,6 +80,14 @@ func (r *KvKeysResource) Configure(_ context.Context, req resource.ConfigureRequ
 		return
 	}
 
+	if client.Token == "" {
+		resp.Diagnostics.AddError(
+			"Vault Provider Not Configured",
+			"vaultpatch_kv_keys requires address, role_id and secret_id in the vaultpatch provider block.",
+		)
+		return
+	}
+
 	r.client = client
 }
 

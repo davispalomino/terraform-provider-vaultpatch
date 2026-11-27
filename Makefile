@@ -2,7 +2,7 @@ HOSTNAME    = registry.terraform.io
 NAMESPACE   = davispalomino
 NAME        = vaultpatch
 BINARY      = terraform-provider-${NAME}
-VERSION     = 1.1.0
+VERSION     = 1.2.0
 OS_ARCH     = darwin_amd64
 INSTALL_DIR = ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
 

@@ -53,18 +53,18 @@ func (p *VaultPatchProvider) Schema(_ context.Context, _ provider.SchemaRequest,
 			"Supports create, update, and delete of individual keys without affecting other keys in the same secret path.",
 		Attributes: map[string]schema.Attribute{
 			"address": schema.StringAttribute{
-				Description: "The URL of the Vault server (e.g., https://vault.example.com).",
-				Required:    true,
+				Description: "The URL of the Vault server (e.g., https://vault.example.com). Optional when the configuration manages no vaultpatch resources.",
+				Optional:    true,
 				Sensitive:   false,
 			},
 			"role_id": schema.StringAttribute{
-				Description: "The AppRole Role ID for authenticating with Vault.",
-				Required:    true,
+				Description: "The AppRole Role ID for authenticating with Vault. Optional when the configuration manages no vaultpatch resources.",
+				Optional:    true,
 				Sensitive:   true,
 			},
 			"secret_id": schema.StringAttribute{
-				Description: "The AppRole Secret ID for authenticating with Vault.",
-				Required:    true,
+				Description: "The AppRole Secret ID for authenticating with Vault. Optional when the configuration manages no vaultpatch resources.",
+				Optional:    true,
 				Sensitive:   true,
 			},
 		},
@@ -76,6 +76,14 @@ func (p *VaultPatchProvider) Configure(ctx context.Context, req provider.Configu
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// A root that only inherits this provider through a module with zero resources must plan without Vault.
+	if config.Address.IsNull() && config.RoleID.IsNull() && config.SecretID.IsNull() {
+		client := &VaultClient{}
+		resp.DataSourceData = client
+		resp.ResourceData = client
 		return
 	}
 
