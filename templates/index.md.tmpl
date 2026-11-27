@@ -1,0 +1,24 @@
+---
+page_title: "{{.ProviderShortName}} Provider"
+description: |-
+  Manage individual keys inside HashiCorp Vault KV v2 secrets without touching the other keys in the same path.
+---
+
+# {{.ProviderShortName}} Provider
+
+The `vaultpatch` provider manages individual keys inside a Vault KV v2 secret. Unlike a full secret write, it reads the current JSON, merges or removes only the keys it owns, and writes it back, so other keys in the same path are never modified.
+
+It authenticates with AppRole (`role_id` and `secret_id`).
+
+## Example Usage
+
+{{tffile "examples/provider/provider.tf"}}
+
+## Optional credentials
+
+`address`, `role_id` and `secret_id` are required only to manage `vaultpatch_kv_keys`. A configuration that manages none, such as a root that inherits the provider from a module with zero instances, can omit the provider block and plans without contacting Vault.
+
+- Setting only some of the three attributes is an error.
+- A `vaultpatch_kv_keys` resource without credentials fails at plan with `Vault Provider Not Configured`.
+
+{{ .SchemaMarkdown | trimspace }}
